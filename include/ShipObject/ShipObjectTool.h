@@ -12,6 +12,10 @@ public:
      ShipObjectTool(QWidget *parent = nullptr);
      ~ShipObjectTool();
      virtual QWidget* getWidget() override;
+signals:
+     void setRotation(int x, int y, int z);
+private slots:
+     void updateValue();
 private:
      Ui::ShipObjectTool* ui;
 };

@@ -12,28 +12,35 @@ ToolWidgetBase::ToolWidgetBase(WindowsDef::WindowId id, QWidget *parent) : QWidg
     m_mainLayout = new QVBoxLayout(this);
     m_mainLayout->setContentsMargins(0, 0, 0, 0);
     m_mainLayout->setSpacing(0);
+}
 
-    // Панель для кнопок
-    m_buttonPanel = new QWidget(this);
-    QHBoxLayout *buttonLayout = new QHBoxLayout(m_buttonPanel);
-    buttonLayout->setContentsMargins(5, 5, 5, 0);
-    buttonLayout->setSpacing(5);
- 
-     // Spacer для выравнивания кнопок вправо
-    buttonLayout->addStretch();
+ToolWidgetBase::ToolWidgetBase(WindowsDef::WindowId id,QList<ComponentWindow> m_components, QWidget *parent):ToolWidgetBase(id,parent){
 
-    m_showModeButton = new QPushButton("✖", this);
-    m_showModeButton->setProperty("showButton", true);
-    m_showModeButton->setProperty("showStatus", 0);
-    m_showModeButton->setFixedSize(24, 24);
-
-    buttonLayout->addWidget(m_showModeButton);
-    // Добавляем панель кнопок в основной layout
-    m_mainLayout->addWidget(m_buttonPanel);
- 
-    // Оставляем место для контента (заполняется через setupUi)
-    m_mainLayout->addStretch();
-    connect(m_showModeButton, &QPushButton::clicked,this, &ToolWidgetBase::clickShowButton);
+    if(!m_components.empty()){
+        m_buttonPanel = new QWidget(this);
+        QHBoxLayout *buttonLayout = new QHBoxLayout(m_buttonPanel);
+        buttonLayout->setContentsMargins(5, 5, 5, 0);
+        buttonLayout->setSpacing(5);
+    
+        // Spacer для выравнивания кнопок вправо
+        buttonLayout->addStretch();
+        m_mainLayout->addWidget(m_buttonPanel);
+        if(m_components.contains(ComponentWindow::ShowOnGrid)){
+            m_showModeButton = new QPushButton("✖", this);
+            m_showModeButton->setProperty("showButton", true);
+            m_showModeButton->setProperty("showStatus", 0);
+            m_showModeButton->setFixedSize(24, 24);
+        
+            buttonLayout->addWidget(m_showModeButton);            
+            connect(m_showModeButton, &QPushButton::clicked,this, &ToolWidgetBase::clickShowButton);
+        }
+        if(m_components.contains(ComponentWindow::SettingsNet)){
+            m_settingsNet = new QPushButton("⚙️", this);
+            m_settingsNet->setFixedSize(24, 24);
+            m_settingsNet->setCheckable(true);
+            buttonLayout->addWidget(m_settingsNet);
+        }
+    }
 }
 
 ToolWidgetBase::~ToolWidgetBase() {}
@@ -61,7 +68,12 @@ void ToolWidgetBase::clickShowButton(){
 
 }
 
+void ToolWidgetBase::clickSettingsButton(bool ckecked){
+
+}
+
 void ToolWidgetBase::updateButton(){
+    if(!m_showModeButton) return;
     m_showModeButton->setProperty("showStatus", (int)m_statusW);
 
     m_showModeButton->style()->unpolish(m_showModeButton);
