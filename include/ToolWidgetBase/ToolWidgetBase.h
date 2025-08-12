@@ -13,9 +13,25 @@ class ToolWidgetBase : public QWidget {
 public:
     explicit ToolWidgetBase(WindowsDef::WindowId id, QWidget *parent = nullptr);
     ~ToolWidgetBase();
+    WindowsDef::WindowId getId(){return m_id;}
 
+    enum class RequestAdd{
+        Add,
+        ClearAdd,
+        Delete
+    };
+
+    enum class StatusWidget{
+        NoAdd,
+        AddProcess,
+        Added
+    };
+    void setAddState(StatusWidget state);
+    virtual QWidget* getWidget() = 0;
 signals:
-    void showModeClicked(WindowsDef::WindowId id,bool show);
+    void showModeClicked(WindowsDef::WindowId id,RequestAdd show,bool &accept);
+private slots:
+    void clickShowButton();
 protected:
     template<typename UiClass>
     void setupUi(UiClass *ui){
@@ -31,4 +47,5 @@ private:
     QWidget *m_buttonPanel;
     QWidget *m_contentWidget = nullptr;
     QVBoxLayout *m_mainLayout;
+    StatusWidget m_statusW;
 };

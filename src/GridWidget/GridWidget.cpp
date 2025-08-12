@@ -2,12 +2,13 @@
 #include <QLayoutItem>
 #include <QMouseEvent>
 #include <QPainter>
-#include "WebcamViewer.h"
+#include "ShipObject.h"
 CellWidget::CellWidget(QWidget *parent) : QWidget(parent) {
     setMouseTracking(true);
     setLayout(new QGridLayout(this));
     m_state = WidgetState::Empty;
     m_stateView = ShowState::Normal;
+    m_addState = StateAdd::Normal;
 
     m_showModeButton = new QPushButton("✎", this); 
     m_deleteButton = new QPushButton("✖", this); 
@@ -66,9 +67,14 @@ bool CellWidget::isFull(){
 void CellWidget::setShowState(ShowState state){
     m_stateView = state;
 }
+void CellWidget::setAddState(StateAdd state){
+    m_addState = state;
+    m_isHovered = false;
+    update();
+}
 
 void CellWidget::enterEvent(QEnterEvent *event) {
-    if (isEmpty()) {
+    if (isEmpty() && m_addState == StateAdd::ReadyAdd ) {
         m_isHovered = true;
         update();
     }
@@ -76,7 +82,7 @@ void CellWidget::enterEvent(QEnterEvent *event) {
 }
 
 void CellWidget::leaveEvent(QEvent *event) {
-    if (isEmpty()) {
+    if (isEmpty() && m_addState == StateAdd::ReadyAdd) {
         m_isHovered = false;
         update();
     }
@@ -84,7 +90,7 @@ void CellWidget::leaveEvent(QEvent *event) {
 }
 
 void CellWidget::mousePressEvent(QMouseEvent *event) {
-    if (isEmpty()) {
+    if (isEmpty() && m_addState == StateAdd::ReadyAdd) {
         qDebug() << "Cell clicked for insertion";
         emit clickedAdd();
     }
@@ -145,8 +151,7 @@ void GridWidget::createGrid(int rows, int cols){
     for (int row = 0; row < rows; ++row) {
         for (int col = 0; col < cols; ++col) {
             CellWidget *cell = new CellWidget(this);
-            cell->setProperty("row", row);
-            cell->setProperty("col", col);
+            cell->setObjectName("CELL" + QString::number(row+col));
             m_gridLayout->addWidget(cell, row, col);
             connect(cell, &CellWidget::clickedAdd, this, &GridWidget::addWidgetClicked);
             connect(cell, &CellWidget::deleteClicked, this, &GridWidget::removeWidgetClicked);
@@ -157,19 +162,61 @@ void GridWidget::createGrid(int rows, int cols){
     setLayout(m_gridLayout);
 }
 
+void GridWidget::addWidgetToCell(QString nameSell, QWidget *widget){
+    CellWidget *cell = findChild<CellWidget*>(nameSell);
+    if(cell){
+        cell->setChildWidget(widget);
+        cellWidgets.insert({nameSell,m_idAdd});
+
+        auto child = findChildren<CellWidget*>();
+        for(auto cell: child){
+            cell->setAddState(StateAdd::Normal);
+        }
+        m_idAdd = WindowsDef::WindowId::UNDEFINED;
+    }
+}
 
 void GridWidget::addWidgetClicked(){
     CellWidget *cell = qobject_cast<CellWidget*>(sender());
     if(cell){
-        WebcamViewer *test = new WebcamViewer();
-    
-        cell->setChildWidget(test);
+        if(m_idAdd == WindowsDef::WindowId::UNDEFINED) return;
+        QString readyName = cell->objectName();
+        emit addReady(m_idAdd, readyName);
     }
 }
+void GridWidget::setAddState(WindowsDef::WindowId _idAdd,StateAdd state){
+    if(state == StateAdd::ReadyAdd){
+        auto child = findChildren<CellWidget*>();
+        for(auto cell: child){
+            cell->setAddState(state);
+        }
+        m_idAdd = _idAdd;
+    }
+}
+
 
 void GridWidget::removeWidgetClicked(){
     CellWidget *cellRemove = qobject_cast<CellWidget*>(sender());
     if(cellRemove){
+        if(cellWidgets.find(cellRemove->objectName()) != cellWidgets.end()){
+            WindowsDef::WindowId id = cellWidgets.at(cellRemove->objectName());
+            emit removeClicked(id);
+            cellRemove->clearChildWidget();
+            if(cellRemove->isFull()){
+                for(auto cell : findChildren<CellWidget*>()){
+                    if(cell!= cellRemove) cell->setVisible(true);
+                }
+                cellRemove->setShowState( CellWidget::ShowState::Normal);
+            }
+            cellWidgets.erase(cellRemove->objectName());
+        }
+        
+    }
+}   
+void GridWidget::removeWidget(WindowsDef::WindowId _idRemove){
+    QString name = getWinName(_idRemove);
+    if(!name.isEmpty()){
+        CellWidget *cellRemove = findChild<CellWidget*>(name);
         cellRemove->clearChildWidget();
         if(cellRemove->isFull()){
             for(auto cell : findChildren<CellWidget*>()){
@@ -177,8 +224,10 @@ void GridWidget::removeWidgetClicked(){
             }
             cellRemove->setShowState( CellWidget::ShowState::Normal);
         }
+        cellWidgets.erase(name);
     }
-}   
+}
+
 
 void GridWidget::showFullClicked(){
     CellWidget *cellFull = qobject_cast<CellWidget*>(sender());   
@@ -190,4 +239,13 @@ void GridWidget::showFullClicked(){
         }
         cellFull->setShowState(needfull ? CellWidget::ShowState::Full : CellWidget::ShowState::Normal);
     }
+}
+
+QString GridWidget::getWinName(const WindowsDef::WindowId &id) const{
+    for (const auto &pair : cellWidgets) {
+        if (pair.second == id) {
+            return pair.first;
+        }
+    }
+    return QString();
 }

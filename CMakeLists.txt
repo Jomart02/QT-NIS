@@ -12,8 +12,8 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/MainWindow/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/GridWidget/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/ToolWidgetBase/)
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/VideoInput/)
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/WebcamViewer/)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/ShipObject/)
+
 
 add_subdirectory(./ToolBoxWidget)
 
@@ -22,8 +22,8 @@ set(HDRS
     ./include/MainWindow/MainWindow.h
     ./include/GridWidget/GridWidget.h
     ./include/ToolWidgetBase/ToolWidgetBase.h
-    ./include/VideoInput/VideoInput.h
-    ./include/WebcamViewer/WebcamViewer.h
+    ./include/ShipObject/ShipObject.h
+    ./include/ShipObject/ShipObjectTool.h
 )
 
 set(SRCS
@@ -31,22 +31,27 @@ set(SRCS
     ./src/MainWindow/MainWindow.cpp
     ./src/GridWidget/GridWidget.cpp
     ./src/ToolWidgetBase/ToolWidgetBase.cpp
-    ./src/VideoInput/VideoInput.cpp
-    ./src/WebcamViewer/WebcamViewer.cpp
+    ./src/ShipObject/ShipObject.cpp
+    ./src/ShipObject/ShipObjectTool.cpp
 )
 
 set(QRCS
-
+    ./resources/res.qrc
 )
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS 
     ui/MainWindow/
-    ui/VideoInput/
+    ui/ShipObject/
 )
+
+find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui 3DCore 3DRender 3DExtras OpenGL OpenGLWidgets)
+# Find OpenGL and GLU
+find_package(OpenGL REQUIRED)
+find_library(GLU_LIBRARY NAMES GLU glu32)
 
 find_package(Qt6 COMPONENTS Widgets Network Quick Multimedia MultimediaWidgets REQUIRED)
 
-add_executable(${PROJECT_NAME} ${SRCS} ${QRCS} ${HDRS} ${QRCS})
+add_executable(${PROJECT_NAME} ${SRCS} ${HDRS} ${QRCS})
 
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -58,12 +63,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Multimedia
     Qt6::MultimediaWidgets
     ToolBoxWidget
+    Qt6::3DCore
+    Qt6::3DRender
+    Qt6::3DExtras
+    Qt6::OpenGL
+    Qt6::OpenGLWidgets
+    ${OPENGL_LIBRARIES}
+    ${GLU_LIBRARY}
 )
-
-find_package(PkgConfig REQUIRED)
-    pkg_check_modules(FFMPEG IMPORTED_TARGET libavcodec libavformat libavutil libswscale libavdevice)
-if (FFMPEG_FOUND)
-    target_link_libraries(${PROJECT_NAME} PRIVATE PkgConfig::FFMPEG)
-else()
-    message(WARNING "FFmpeg not found. Qt Multimedia may not work correctly.")
-endif()

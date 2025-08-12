@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/model">
+       <file alias="boat">models/boat.obj</file>
+    </qresource>
+</RCC>

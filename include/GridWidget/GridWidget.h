@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 #include <QEnterEvent>
 #include <QPushButton>
+#include "globalVar.h"
 
 class CellWidget : public QWidget {
     Q_OBJECT
@@ -31,6 +32,7 @@ public:
     bool isEmpty() const;
     bool isFull();
     void setShowState(ShowState state);
+    void setAddState(StateAdd state);
 signals:
     void clickedAdd();
     void showModeClicked();
@@ -52,6 +54,7 @@ private:
     QColor m_normalColor = Qt::white;
     QColor m_hoverColor = QColor(135, 206, 250, 100); // Полупрозрачный светло-синий
     ShowState m_stateView;
+    StateAdd m_addState;
 };
 
 class GridWidget : public QWidget{
@@ -59,7 +62,13 @@ class GridWidget : public QWidget{
 public:
     GridWidget(QWidget *parent = nullptr);
     ~GridWidget();
-    void addWidgetToCell(int row, int col, QWidget *widget);
+    void addWidgetToCell(QString nameSell, QWidget *widget);
+signals:
+    void addReady(WindowsDef::WindowId id,QString nameSell);
+    void removeClicked(WindowsDef::WindowId id);
+public slots:
+    void setAddState(WindowsDef::WindowId _idAdd,StateAdd state);
+    void removeWidget(WindowsDef::WindowId _idRemove);
 private slots:
     void addWidgetClicked();
     void removeWidgetClicked();
@@ -68,7 +77,9 @@ protected:
 
 private:
     void createGrid(int rows, int cols);
-
+    QString getWinName(const WindowsDef::WindowId &id) const;
 private:
     QGridLayout *m_gridLayout = nullptr;
+    WindowsDef::WindowId m_idAdd = WindowsDef::WindowId::UNDEFINED;
+    std::map<QString, WindowsDef::WindowId> cellWidgets;
 };

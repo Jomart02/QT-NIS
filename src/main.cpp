@@ -6,7 +6,7 @@ int main(int argc, char* argv[])
     QApplication app(argc, argv);   
 
     MainWindow *mainW = new MainWindow();
-    mainW->show();
+    mainW->showFullScreen();
 
     return app.exec(); 
 }
