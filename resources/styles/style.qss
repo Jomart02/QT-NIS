@@ -1,0 +1,15 @@
+QPushButton{
+     color:black;
+}
+QPushButton[showButton = true]{
+     background-color: white;
+}
+QPushButton[showButton = true][showStatus = "0"]{
+     background-color: red;
+}
+QPushButton[showButton = true][showStatus = "1"]{
+     background-color: grey;
+}
+QPushButton[showButton = true][showStatus = "2"]{
+     background-color: green;
+}

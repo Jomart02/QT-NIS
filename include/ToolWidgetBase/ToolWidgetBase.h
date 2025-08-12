@@ -22,7 +22,7 @@ public:
     };
 
     enum class StatusWidget{
-        NoAdd,
+        NoAdd = 0,
         AddProcess,
         Added
     };
@@ -41,6 +41,8 @@ protected:
         }
         ui->setupUi(m_contentWidget);
     }
+private:
+    void updateButton();
 private:
     WindowsDef::WindowId m_id;
     QPushButton *m_showModeButton;

@@ -1,6 +1,7 @@
 #include "ToolWidgetBase.h"
 #include <QHBoxLayout>
 #include <QDebug>
+#include <QStyle>
 
 ToolWidgetBase::ToolWidgetBase(WindowsDef::WindowId id, QWidget *parent) : QWidget(parent), m_id(id) {
     QMetaEnum metaEnum = QMetaEnum::fromType<WindowsDef::WindowId>();
@@ -22,11 +23,11 @@ ToolWidgetBase::ToolWidgetBase(WindowsDef::WindowId id, QWidget *parent) : QWidg
     buttonLayout->addStretch();
 
     m_showModeButton = new QPushButton("✖", this);
-
+    m_showModeButton->setProperty("showButton", true);
+    m_showModeButton->setProperty("showStatus", 0);
     m_showModeButton->setFixedSize(24, 24);
 
     buttonLayout->addWidget(m_showModeButton);
-    m_showModeButton->setStyleSheet("QPushButton::checked{background-color:red;}");
     // Добавляем панель кнопок в основной layout
     m_mainLayout->addWidget(m_buttonPanel);
  
@@ -39,8 +40,7 @@ ToolWidgetBase::~ToolWidgetBase() {}
 
 void ToolWidgetBase::setAddState(StatusWidget state){
     m_statusW = state;
-    qDebug() << "AAAA";
-    //Переключение отображения при добавленности 
+    updateButton();
 }
 
 void ToolWidgetBase::clickShowButton(){
@@ -48,17 +48,23 @@ void ToolWidgetBase::clickShowButton(){
     if(m_statusW == StatusWidget::NoAdd){
         emit showModeClicked(m_id, RequestAdd::Add,accept);
         if(accept){
-            // m_showModeButton->setChecked(false); //проаерти поменять и будет другая конопка
             m_statusW =StatusWidget::AddProcess;
         }
     }else if(m_statusW == StatusWidget::AddProcess){
-        // m_showModeButton->setChecked(false); //проаерти поменять и будет другая конопка
         emit showModeClicked(m_id, RequestAdd::ClearAdd,accept);
         m_statusW = StatusWidget::NoAdd;
     }else if(m_statusW == StatusWidget::Added){
-        bool accept = true;
         emit showModeClicked(m_id, RequestAdd::Delete,accept);
         m_statusW =StatusWidget::NoAdd;
     }
-    
+    updateButton();
+
+}
+
+void ToolWidgetBase::updateButton(){
+    m_showModeButton->setProperty("showStatus", (int)m_statusW);
+
+    m_showModeButton->style()->unpolish(m_showModeButton);
+    m_showModeButton->style()->polish(m_showModeButton);
+    m_showModeButton->update();
 }

@@ -185,13 +185,11 @@ void GridWidget::addWidgetClicked(){
     }
 }
 void GridWidget::setAddState(WindowsDef::WindowId _idAdd,StateAdd state){
-    if(state == StateAdd::ReadyAdd){
-        auto child = findChildren<CellWidget*>();
-        for(auto cell: child){
-            cell->setAddState(state);
-        }
-        m_idAdd = _idAdd;
+    auto child = findChildren<CellWidget*>();
+    for(auto cell: child){
+        cell->setAddState(state);
     }
+    m_idAdd = _idAdd;
 }
 
 

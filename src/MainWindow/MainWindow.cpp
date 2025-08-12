@@ -2,8 +2,19 @@
 #include "ui_MainWindow.h"
 #include "MainWindow.h"
 #include "ShipObjectTool.h"
+#include <QFile>
+#include <QTimer>
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
+
+    QFile file(":/styles/style");
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "Could not open QSS file:" ;
+    }else{
+        QString style = file.readAll();
+        setStyleSheet(style);
+    }
+
     ShipObjectTool *ship = new ShipObjectTool(this);
 
     ui->PanelWidget->addWidget("Ship", ship, ship->metaObject()->className());
@@ -51,6 +62,9 @@ void MainWindow::requestAdd(WindowsDef::WindowId selectAdd, QString nameCell){
         ui->widgetGrid->addWidgetToCell(nameCell, addWidget);
         currentAdd->setAddState(ToolWidgetBase::StatusWidget::Added);
         currentAdd = nullptr;
+        if(selectAdd == WindowsDef::WindowId::SHIP_MODEL){
+            QTimer::singleShot(200,[=](){ showFullScreen();});
+        }
     }
 }
 
