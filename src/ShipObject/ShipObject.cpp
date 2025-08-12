@@ -1,9 +1,17 @@
 #include "ShipObject.h"
 #include <QFile>
 
-ShipObject::ShipObject( QWidget* parent) : QOpenGLWidget(parent) {
-     loadOBJ(":/model/boat");
-     setMouseTracking(true); // Enable mouse tracking for camera
+ShipObject::ShipObject( QWidget* parent) : QOpenGLWidget(parent) ,
+    rotationX(0.0f), rotationY(0.0f), rotationZ(0.0f),
+    cameraPitch(0.0f), cameraYaw(0.0f), cameraDistance(5.0f),
+    colorR(0.5f), colorG(0.5f), colorB(0.5f) 
+{ 
+    
+        loadOBJ(":/model/boat");
+    setMouseTracking(true);
+    setOrientation(0, 0, 0);
+    
+
 }
 
 void ShipObject::loadOBJ(const QString& filename) {
@@ -12,16 +20,12 @@ void ShipObject::loadOBJ(const QString& filename) {
         qDebug() << "Failed to open" << filename;
         return;
     }
-
     QTextStream in(&file);
     float minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9, minZ = 1e9, maxZ = -1e9;
-
     while (!in.atEnd()) {
         QString line = in.readLine().trimmed();
         QStringList tokens = line.split(' ', Qt::SkipEmptyParts);
-
         if (tokens.isEmpty()) continue;
-
         if (tokens[0] == "v") {
             Vertex v = {tokens[1].toFloat(), tokens[2].toFloat(), tokens[3].toFloat()};
             vertices.push_back(v);
@@ -45,10 +49,7 @@ void ShipObject::loadOBJ(const QString& filename) {
             faces.push_back(f);
         }
     }
-
     file.close();
-
-    // Calculate center and scale
     center = {(minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2};
     float maxDim = std::max({maxX - minX, maxY - minY, maxZ - minZ});
     scale = maxDim != 0 ? 3.0f / maxDim : 1.0f;
@@ -56,18 +57,17 @@ void ShipObject::loadOBJ(const QString& filename) {
 
 void ShipObject::initializeGL() {
     initializeOpenGLFunctions();
-
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClearColor(0.2f, 0.4f, 0.8f, 1.0f); // Set background to soft blue
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_COLOR_MATERIAL);
-    float lightPos[] = {0.5f, 0.5f, 1.0f, 0.0f};
+    float lightPos[] = {0.0f, 1.0f, 0.0f, 0.0f}; // Directional light from above
     float diffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    float ambient[] = {0.2f, 0.2f, 0.2f, 1.0f};
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-
-    // Debug OpenGL version
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
     qDebug() << "OpenGL Version:" << QString((const char*)glGetString(GL_VERSION));
 }
 
@@ -75,8 +75,6 @@ void ShipObject::resizeGL(int w, int h) {
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-
-    // Custom perspective matrix
     float fov = 45.0f;
     float aspect = w / (float)(h ? h : 1);
     float zNear = 0.1f;
@@ -89,47 +87,36 @@ void ShipObject::resizeGL(int w, int h) {
         0, 0, (2 * zFar * zNear) / (zNear - zFar), 0
     };
     glLoadMatrixf(matrix);
-
     glMatrixMode(GL_MODELVIEW);
 }
 
 void ShipObject::paintGL() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-
-    // Apply camera transformations
     glRotatef(cameraPitch, 1.0f, 0.0f, 0.0f);
     glRotatef(cameraYaw, 0.0f, 1.0f, 0.0f);
     glTranslatef(0.0f, 0.0f, -cameraDistance);
-
     glScalef(scale, scale, scale);
     glTranslatef(-center.x, -center.y, -center.z);
+    glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // Correct initial model orientation
     glRotatef(rotationX, 1.0f, 0.0f, 0.0f); // Roll (X-axis)
     glRotatef(rotationY, 0.0f, 1.0f, 0.0f); // Pitch (Y-axis)
     glRotatef(rotationZ, 0.0f, 0.0f, 1.0f); // Yaw (Z-axis)
-
-    // Draw coordinate axes (larger and thicker)
-    glDisable(GL_LIGHTING); // Disable lighting for axes
-    glLineWidth(4.0f); // Thicker lines for visibility
+    glDisable(GL_LIGHTING);
+    glLineWidth(4.0f);
     glBegin(GL_LINES);
-    // X-axis (Roll, Red)
     glColor3f(1.0f, 0.0f, 0.0f);
     glVertex3f(-2.0f, 0.0f, 0.0f);
     glVertex3f(2.0f, 0.0f, 0.0f);
-    // Y-axis (Pitch, Green)
     glColor3f(0.0f, 1.0f, 0.0f);
     glVertex3f(0.0f, -2.0f, 0.0f);
     glVertex3f(0.0f, 2.0f, 0.0f);
-    // Z-axis (Yaw, Blue)
     glColor3f(0.0f, 0.0f, 1.0f);
     glVertex3f(0.0f, 0.0f, -2.0f);
     glVertex3f(0.0f, 0.0f, 2.0f);
     glEnd();
-    glEnable(GL_LIGHTING); // Re-enable lighting for the model
-
-    // Draw OBJ model with a uniform color
-    glColor3f(0.8f, 0.8f, 1.0f); // Light blue color for the model
-
+    glEnable(GL_LIGHTING);
+    glColor3f(colorR, colorG, colorB); // Use dynamic color
     for (const auto& face : faces) {
         glBegin(GL_POLYGON);
         for (size_t i = 0; i < face.vertexIndices.size(); ++i) {
@@ -183,5 +170,21 @@ void ShipObject::setRotationY(int angle) {
 
 void ShipObject::setRotationZ(int angle) {
     rotationZ = static_cast<float>(angle);
+    update();
+}
+
+void ShipObject::setOrientation(int roll, int pitch, int yaw) {
+    rotationX = static_cast<float>(roll);
+    rotationY = static_cast<float>(pitch);
+    rotationZ = static_cast<float>(yaw);
+    qDebug() << "Set orientation: roll =" << roll << "pitch =" << pitch << "yaw =" << yaw;
+    update();
+}
+
+void ShipObject::setColor(float r, float g, float b) {
+    colorR = r;
+    colorG = g;
+    colorB = b;
+    qDebug() << "Set color: R =" << r << "G =" << g << "B =" << b;
     update();
 }

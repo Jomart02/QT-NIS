@@ -24,26 +24,24 @@ public slots:
     void setRotationX(int angle);
     void setRotationY(int angle);
     void setRotationZ(int angle);
-
+    void setOrientation(int roll, int pitch, int yaw);
+    void setColor(float r, float g, float b);
+private:
+     void loadOBJ(const QString& filename);
 private:
     struct Vertex { float x, y, z; };
     struct Normal { float x, y, z; };
     struct Face { std::vector<int> vertexIndices; std::vector<int> normalIndices; };
 
-    std::vector<Vertex> vertices;
-    std::vector<Normal> normals;
-    std::vector<Face> faces;
-    float rotationX = 90.0f; // Initial rotation by 90 degrees on X-axis
-    float rotationY = 0.0f;
-    float rotationZ = 0.0f;
-    float scale = 1.0f;
-    Vertex center = {0.0f, 0.0f, 0.0f};
-
-    // Camera controls
-    float cameraDistance = 5.0f;
-    float cameraYaw = 0.0f;
-    float cameraPitch = 0.0f;
+    QVector<Vertex> vertices;
+    QVector<Normal> normals;
+    QVector<Face> faces;
+    Vertex center;
+    float scale;
+    float rotationX, rotationY, rotationZ;
+    float cameraPitch, cameraYaw, cameraDistance;
     QPoint lastMousePos;
+    float colorR, colorG, colorB; // Store ship color
 
-    void loadOBJ(const QString& filename);
+   
 };

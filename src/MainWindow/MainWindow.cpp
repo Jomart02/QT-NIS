@@ -4,6 +4,7 @@
 #include "ShipObjectTool.h"
 #include <QFile>
 #include <QTimer>
+#include "NavigationInfoTool.h"
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
 
@@ -16,9 +17,12 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent), ui(new Ui::MainWin
     }
 
     ShipObjectTool *ship = new ShipObjectTool(this);
+    NavigationInfoTool *navi = new NavigationInfoTool(this);
 
     ui->PanelWidget->addWidget("Ship", ship, ship->metaObject()->className());
+    ui->PanelWidget->addWidget("Navi", navi, navi->metaObject()->className());
     connect(ship,&ToolWidgetBase::showModeClicked, this,&MainWindow::showModeClicked);
+    connect(navi,&ToolWidgetBase::showModeClicked, this,&MainWindow::showModeClicked);
     connect(this, &MainWindow::addState, ui->widgetGrid, &GridWidget::setAddState);
     connect(ui->widgetGrid,&GridWidget::addReady,this, &MainWindow::requestAdd);
     connect(ui->widgetGrid,&GridWidget::removeClicked,this, &MainWindow::removeWidgetFromGrid);
@@ -46,6 +50,7 @@ void MainWindow::showModeClicked(WindowsDef::WindowId id,ToolWidgetBase::Request
             emit addState(WindowsDef::WindowId::UNDEFINED,StateAdd::Normal );
         }else if(show == ToolWidgetBase::RequestAdd::Delete){
             ui->widgetGrid->removeWidget(id);
+            currentAdd = nullptr;
         }
     }else{
         accept = false;
@@ -56,9 +61,9 @@ void MainWindow::requestAdd(WindowsDef::WindowId selectAdd, QString nameCell){
     QMetaEnum metaEnum = QMetaEnum::fromType<WindowsDef::WindowId>();
     QString windowIdStr = metaEnum.valueToKey(static_cast<int>(selectAdd));
     ToolWidgetBase *child = findChild<ToolWidgetBase*>(windowIdStr);
+    
     if(child){
-        QWidget *addWidget =  child->getWidget();
-        addWidget->setParent(this);
+        QWidget *addWidget = child->getWidget();
         ui->widgetGrid->addWidgetToCell(nameCell, addWidget);
         currentAdd->setAddState(ToolWidgetBase::StatusWidget::Added);
         currentAdd = nullptr;

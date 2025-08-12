@@ -13,9 +13,11 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/MainWindow/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/GridWidget/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/ToolWidgetBase/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/ShipObject/)
-
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/NavigationInfo/)
 
 add_subdirectory(./ToolBoxWidget)
+add_subdirectory(./internal/NavyComponents)
+add_subdirectory(./internal/QssStyleManager)
 
 set(HDRS
     ./include/globalVar.h
@@ -24,6 +26,8 @@ set(HDRS
     ./include/ToolWidgetBase/ToolWidgetBase.h
     ./include/ShipObject/ShipObject.h
     ./include/ShipObject/ShipObjectTool.h
+    ./include/NavigationInfo/NavigationInfo.h
+    ./include/NavigationInfo/NavigationInfoTool.h
 )
 
 set(SRCS
@@ -33,6 +37,8 @@ set(SRCS
     ./src/ToolWidgetBase/ToolWidgetBase.cpp
     ./src/ShipObject/ShipObject.cpp
     ./src/ShipObject/ShipObjectTool.cpp
+    ./src/NavigationInfo/NavigationInfo.cpp
+    ./src/NavigationInfo/NavigationInfoTool.cpp
 )
 
 set(QRCS
@@ -42,6 +48,7 @@ set(QRCS
 set(CMAKE_AUTOUIC_SEARCH_PATHS 
     ui/MainWindow/
     ui/ShipObject/
+    ui/NavigationInfo/
 )
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui 3DCore 3DRender 3DExtras OpenGL OpenGLWidgets)
@@ -70,4 +77,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::OpenGLWidgets
     ${OPENGL_LIBRARIES}
     ${GLU_LIBRARY}
+    QssStyleManager
+    CircularValueWidgets
 )

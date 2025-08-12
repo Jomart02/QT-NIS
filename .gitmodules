@@ -1,0 +1,6 @@
+[submodule "internal/NavyComponents"]
+	path = internal/NavyComponents
+	url = https://github.com/Jomart02/NavyComponents.git
+[submodule "internal/QssStyleManager"]
+	path = internal/QssStyleManager
+	url = https://github.com/Jomart02/QssStyleManager.git
