@@ -13,7 +13,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget* parent = nullptr);
+    static MainWindow* getInstance();
+    
     ~MainWindow();
 signals:
     void addState(WindowsDef::WindowId id,StateAdd state);
@@ -22,6 +23,10 @@ private slots:
     void requestAdd(WindowsDef::WindowId selectAdd, QString nameCell);
     void removeWidgetFromGrid(WindowsDef::WindowId remove);
 private:
+    MainWindow(QWidget* parent = nullptr);
+private:
+    
     Ui::MainWindow* ui;
     ToolWidgetBase *currentAdd = nullptr;
+    static MainWindow* _instance; 
 };

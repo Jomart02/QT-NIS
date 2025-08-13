@@ -10,6 +10,8 @@ public:
      NavigationInfoTool(QWidget *parent = nullptr);
      ~NavigationInfoTool();
      virtual QWidget* getWidget() override;
+protected:
+     virtual BaseSettingsWindow* getSettingsWidget() override;
 private:
      Ui::NavigationInfoTool* ui;
 };

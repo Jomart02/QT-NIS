@@ -21,6 +21,10 @@ QWidget* ShipObjectTool::getWidget(){
     return ship;
 }
 
+BaseSettingsWindow* ShipObjectTool::getSettingsWidget(){
+    return nullptr;
+}
+
 void ShipObjectTool::updateValue(){
     int x = ui->horizontalSliderX->value();
     int y = ui->horizontalSliderY->value();

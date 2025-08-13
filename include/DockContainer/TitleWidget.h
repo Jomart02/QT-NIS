@@ -16,7 +16,6 @@ class TitleWidget : public QWidget
         TitleWidget(QString titleName, QWidget* parent = nullptr);
         ~TitleWidget();
         void setTitle(const QString& title);
-        void setRaise(bool flag);
     private:
 		void showEvent(QShowEvent* event) override;
         void mousePressEvent(QMouseEvent* event) override;

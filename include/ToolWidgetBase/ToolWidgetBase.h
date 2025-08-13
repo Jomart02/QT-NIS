@@ -7,7 +7,7 @@
 #include <QHBoxLayout>
 #include <qlist.h>
 #include "globalVar.h"
-
+#include "BaseSettingsWindow.h"
 
 class ToolWidgetBase : public QWidget {
     Q_OBJECT
@@ -34,8 +34,6 @@ public:
         Added
     };
 
-
-
     void setAddState(StatusWidget state);
     virtual QWidget* getWidget() = 0;
 signals:
@@ -52,13 +50,13 @@ protected:
         }
         ui->setupUi(m_contentWidget);
     }
+    virtual BaseSettingsWindow* getSettingsWidget() = 0;
 private:
     void updateButton();
 private:
     WindowsDef::WindowId m_id;
     QPushButton *m_showModeButton = nullptr;
     QPushButton *m_settingsNet = nullptr;
-    QWidget *m_buttonPanel = nullptr;
     QWidget *m_contentWidget = nullptr;
     QVBoxLayout *m_mainLayout = nullptr;
     StatusWidget m_statusW;

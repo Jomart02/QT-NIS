@@ -7,7 +7,7 @@ ShipObject::ShipObject( QWidget* parent) : QOpenGLWidget(parent) ,
     colorR(0.5f), colorG(0.5f), colorB(0.5f) 
 { 
     
-        loadOBJ(":/model/boat");
+    loadOBJ(":/model/boat");
     setMouseTracking(true);
     setOrientation(0, 0, 0);
     

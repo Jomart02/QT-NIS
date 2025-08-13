@@ -6,22 +6,40 @@
 #include <QApplication>
 #include <QStyle>
 
-DockContainer::DockContainer(QString titleName, QWidget* content, QWidget* parent,Qt::WindowType typeWindow) :
-    QDockWidget(parent,typeWindow),
+DockContainer::DockContainer(QString titleName, QWidget* content, QWidget* parent) :
+    QDockWidget(parent),
     title(new TitleWidget(titleName, this)),
     content(content)
 {
     content->setParent(this);
-    //content->setAutoFillBackground(true);
     setAllowedAreas(Qt::AllDockWidgetAreas);
     setTitleBarWidget(title);
     setWidget(content);
 
+    connect(title, &TitleWidget::show, this, &DockContainer::show_handler);
+    connect(title, &TitleWidget::close, this, &DockContainer::close);
+    connect(title,&TitleWidget::d_click, this,[=]() {
+        content->setVisible(!content->isVisible());
+        adjustSize();
+    });
 }
 
 
 void DockContainer::paintEvent(QPaintEvent *event)
 {
+QPainter painter(this);
+    painter.setRenderHint(QPainter::RenderHint::Antialiasing); // Включаем сглаживание
+
+    // Рисуем фон с закругленными углами
+    QRectF rect(this->rect());
+    
+    qreal radius = 8; // Радиус закругления углов
+    QPainterPath path;
+
+    QColor color;
+    painter.setBrush(m_colorBase);
+    painter.setPen(Qt::NoPen); // Убираем рамку на этом этапе
+    painter.drawRoundedRect(rect, radius, radius);
 
 }
 
@@ -57,12 +75,14 @@ void DockContainer::close()
     else closeAttempt();
 }
 
-QSize DockContainer::getTitleSize()
-{
-    return title->size();
-}
-
 DockContainer::~DockContainer()
 {
 
+}
+QColor DockContainer::getColorBase() const{
+    return m_colorBase;
+}
+void DockContainer::setColorBase(const QColor &color){
+    m_colorBase = color;
+    update();
 }

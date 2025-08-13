@@ -14,6 +14,8 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/GridWidget/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/ToolWidgetBase/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/ShipObject/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/NavigationInfo/)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/DockContainer/)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/BaseSettingsWindow/)
 
 add_subdirectory(./ToolBoxWidget)
 add_subdirectory(./internal/NavyComponents)
@@ -28,6 +30,10 @@ set(HDRS
     ./include/ShipObject/ShipObjectTool.h
     ./include/NavigationInfo/NavigationInfo.h
     ./include/NavigationInfo/NavigationInfoTool.h
+    ./include/NavigationInfo/SettingsNavigation.h
+    ./include/DockContainer/DockContainer.h
+    ./include/DockContainer/TitleWidget.h
+    ./include/BaseSettingsWindow/BaseSettingsWindow.h
 )
 
 set(SRCS
@@ -39,6 +45,10 @@ set(SRCS
     ./src/ShipObject/ShipObjectTool.cpp
     ./src/NavigationInfo/NavigationInfo.cpp
     ./src/NavigationInfo/NavigationInfoTool.cpp
+    ./src/NavigationInfo/SettingsNavigation.cpp
+    ./src/DockContainer/DockContainer.cpp
+    ./src/DockContainer/TitleWidget.cpp
+    ./src/BaseSettingsWindow/BaseSettingsWindow.cpp
 )
 
 set(QRCS
@@ -49,6 +59,7 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS
     ui/MainWindow/
     ui/ShipObject/
     ui/NavigationInfo/
+    ui/DockContainer/
 )
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui 3DCore 3DRender 3DExtras OpenGL OpenGLWidgets)

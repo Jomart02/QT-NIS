@@ -14,6 +14,13 @@ public:
     DockContainer(QString titleName, QWidget* content, QWidget* parent = nullptr);
     ~DockContainer();
 
+    enum NotifyType
+    {
+        NOTIFY_UNKNOWN = 0,
+        NOTIFY_SHOW,
+        NOTIFY_CLOSE
+    };
+
     QColor getColorBase() const;
     void setColorBase(const QColor &color);
 protected:
@@ -23,15 +30,15 @@ public:
     void setTitle(const QString& titleName);
     void setTitleRaise(bool flag);
     void hideTitleBar();
+    void setMakeSignalBeforeClose(bool makerSignal);
 signals:
-    void click();
+    void notify(NotifyType what);
     void closeAttempt();
 public slots:
     void close();
 
 private slots:
     void show_handler();
-    void changePalette(QString theme);
 private:
     TitleWidget* title;
     QWidget* content;

@@ -5,7 +5,6 @@ namespace Ui
     class ShipObjectTool;
 }
 
-
 class ShipObjectTool : public ToolWidgetBase{
      Q_OBJECT
 public:
@@ -14,6 +13,8 @@ public:
      virtual QWidget* getWidget() override;
 signals:
      void setRotation(int x, int y, int z);
+protected:
+     virtual BaseSettingsWindow* getSettingsWidget() override;
 private slots:
      void updateValue();
 private:

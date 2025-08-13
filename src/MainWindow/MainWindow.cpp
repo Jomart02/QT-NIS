@@ -5,6 +5,16 @@
 #include <QFile>
 #include <QTimer>
 #include "NavigationInfoTool.h"
+
+MainWindow* MainWindow::_instance = nullptr;
+
+MainWindow* MainWindow::getInstance(){
+     if (_instance == nullptr) {
+        _instance = new MainWindow();
+    }
+    return _instance;
+}
+
 MainWindow::MainWindow(QWidget* parent): QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
 

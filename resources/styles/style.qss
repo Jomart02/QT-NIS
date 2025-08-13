@@ -1,3 +1,27 @@
+
+TitleWidget QFrame#frameDock{
+    background-color: #000D81;
+    /* border: 1px solid #000D81; */
+}
+
+TitleWidget QFrame#frameDock{
+    border: 2px solid #000D81;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    max-height: 44px;
+    min-height: 44px;
+}
+
+TitleWidget QLabel{
+    color:white;
+}
+
+TitleWidget QPushButton{
+    border:0;
+    background-color: transparent;
+    margin:0px;
+}
+
 QPushButton{
      color:black;
 }
