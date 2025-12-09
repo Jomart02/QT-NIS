@@ -5,7 +5,7 @@
 #include <QFile>
 #include <QTimer>
 #include "NavigationInfoTool.h"
-
+#include "MapViewTool.h"
 MainWindow* MainWindow::_instance = nullptr;
 
 MainWindow* MainWindow::getInstance(){
@@ -28,11 +28,15 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent), ui(new Ui::MainWin
 
     ShipObjectTool *ship = new ShipObjectTool(this);
     NavigationInfoTool *navi = new NavigationInfoTool(this);
+    MapViewTool *mapView =  new MapViewTool(this);
 
     ui->PanelWidget->addWidget("Ship", ship, ship->metaObject()->className());
     ui->PanelWidget->addWidget("Navi", navi, navi->metaObject()->className());
+    ui->PanelWidget->addWidget("Map", mapView, mapView->metaObject()->className());
+
     connect(ship,&ToolWidgetBase::showModeClicked, this,&MainWindow::showModeClicked);
     connect(navi,&ToolWidgetBase::showModeClicked, this,&MainWindow::showModeClicked);
+    connect(mapView,&ToolWidgetBase::showModeClicked, this,&MainWindow::showModeClicked);
     connect(this, &MainWindow::addState, ui->widgetGrid, &GridWidget::setAddState);
     connect(ui->widgetGrid,&GridWidget::addReady,this, &MainWindow::requestAdd);
     connect(ui->widgetGrid,&GridWidget::removeClicked,this, &MainWindow::removeWidgetFromGrid);

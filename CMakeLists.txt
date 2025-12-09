@@ -16,6 +16,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/ShipObject/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/NavigationInfo/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/DockContainer/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/BaseSettingsWindow/)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/MapView/)
 
 add_subdirectory(./ToolBoxWidget)
 add_subdirectory(./internal/NavyComponents)
@@ -34,6 +35,8 @@ set(HDRS
     ./include/DockContainer/DockContainer.h
     ./include/DockContainer/TitleWidget.h
     ./include/BaseSettingsWindow/BaseSettingsWindow.h
+    ./include/MapView/MapViewTool.h
+    ./include/MapView/MapView.h
 )
 
 set(SRCS
@@ -49,10 +52,13 @@ set(SRCS
     ./src/DockContainer/DockContainer.cpp
     ./src/DockContainer/TitleWidget.cpp
     ./src/BaseSettingsWindow/BaseSettingsWindow.cpp
+    ./src/MapView/MapViewTool.cpp
+    ./src/MapView/MapView.cpp
 )
 
 set(QRCS
     ./resources/res.qrc
+    ./qml/map.qrc
 )
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS 
@@ -60,9 +66,10 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS
     ui/ShipObject/
     ui/NavigationInfo/
     ui/DockContainer/
+    ui/MapView/
 )
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets Core Gui 3DCore 3DRender 3DExtras OpenGL OpenGLWidgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Quick Location Positioning QuickWidgets Core Gui 3DCore 3DRender 3DExtras OpenGL OpenGLWidgets)
 # Find OpenGL and GLU
 find_package(OpenGL REQUIRED)
 find_library(GLU_LIBRARY NAMES GLU glu32)
@@ -90,4 +97,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${GLU_LIBRARY}
     QssStyleManager
     CircularValueWidgets
+    Qt6::Quick 
+    Qt6::Location 
+    Qt6::Positioning
+    Qt6::QuickWidgets
 )

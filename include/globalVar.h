@@ -7,7 +7,8 @@ namespace WindowsDef{
     enum class WindowId{
         UNDEFINED,
         SHIP_MODEL,
-        NAVI_INFO
+        NAVI_INFO,
+        MAP
     };
     Q_ENUM_NS(WindowId)
 };
