@@ -91,44 +91,72 @@ void ShipObject::resizeGL(int w, int h) {
 }
 
 void ShipObject::paintGL() {
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   // Очистка буферов цвета и глубины
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    // Сброс матрицы вида
     glLoadIdentity();
+
+    // --- 1. ТРАНСФОРМАЦИЯ КАМЕРЫ ---
+    // Сначала отодвигаем камеру назад
+    glTranslatef(0.0f, 0.0f, -cameraDistance);
+    
+    // Вращаем камеру вокруг центра (орбитальное вращение)
     glRotatef(cameraPitch, 1.0f, 0.0f, 0.0f);
     glRotatef(cameraYaw, 0.0f, 1.0f, 0.0f);
-    glTranslatef(0.0f, 0.0f, -cameraDistance);
-    glScalef(scale, scale, scale);
-    glTranslatef(-center.x, -center.y, -center.z);
-    glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // Correct initial model orientation
-    glRotatef(rotationX, 1.0f, 0.0f, 0.0f); // Roll (X-axis)
-    glRotatef(rotationY, 0.0f, 1.0f, 0.0f); // Pitch (Y-axis)
-    glRotatef(rotationZ, 0.0f, 0.0f, 1.0f); // Yaw (Z-axis)
+    
+    // Смещаем мир относительно точки обзора (панорамирование)
+    // Если вы не используете правую кнопку мыши, cameraTarget будет (0,0,0)
+    glTranslatef(-cameraTarget.x(), -cameraTarget.y(), -cameraTarget.z());
+
+    // --- 2. СЕТКА ИЛИ ОСИ КООРДИНАТ (опционально) ---
     glDisable(GL_LIGHTING);
-    glLineWidth(4.0f);
+    glLineWidth(2.0f);
     glBegin(GL_LINES);
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glVertex3f(-2.0f, 0.0f, 0.0f);
-    glVertex3f(2.0f, 0.0f, 0.0f);
-    glColor3f(0.0f, 1.0f, 0.0f);
-    glVertex3f(0.0f, -2.0f, 0.0f);
-    glVertex3f(0.0f, 2.0f, 0.0f);
-    glColor3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(0.0f, 0.0f, -2.0f);
-    glVertex3f(0.0f, 0.0f, 2.0f);
+        // Ось X (Красная)
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glVertex3f(-5.0f, 0.0f, 0.0f); glVertex3f(5.0f, 0.0f, 0.0f);
+        // Ось Y (Зеленая)
+        glColor3f(0.0f, 1.0f, 0.0f);
+        glVertex3f(0.0f, -5.0f, 0.0f); glVertex3f(0.0f, 5.0f, 0.0f);
+        // Ось Z (Синяя)
+        glColor3f(0.0f, 0.0f, 1.0f);
+        glVertex3f(0.0f, 0.0f, -5.0f); glVertex3f(0.0f, 0.0f, 5.0f);
     glEnd();
     glEnable(GL_LIGHTING);
-    glColor3f(colorR, colorG, colorB); // Use dynamic color
-    for (const auto& face : faces) {
-        glBegin(GL_POLYGON);
-        for (size_t i = 0; i < face.vertexIndices.size(); ++i) {
-            int nIdx = face.normalIndices[i];
-            if (nIdx >= 0 && nIdx < static_cast<int>(normals.size())) {
-                glNormal3f(normals[nIdx].x, normals[nIdx].y, normals[nIdx].z);
+
+    // --- 3. ТРАНСФОРМАЦИЯ И ОТРИСОВКА МОДЕЛИ ---
+    glPushMatrix(); // Сохраняем матрицу, чтобы вращения модели не влияли на другие объекты
+        
+        // Приводим модель к единому масштабу и центрируем
+        glScalef(scale, scale, scale);
+        glTranslatef(-center.x, -center.y, -center.z);
+
+        // Поворот самой модели (из ваших настроек/слайдеров)
+        glRotatef(rotationX, 1.0f, 0.0f, 0.0f);
+        glRotatef(rotationY, 0.0f, 1.0f, 0.0f);
+        glRotatef(rotationZ, 0.0f, 0.0f, 1.0f);
+
+        // Установка цвета материала
+        glColor3f(colorR, colorG, colorB);
+
+        // Отрисовка полигонов модели
+        for (const auto& face : faces) {
+            glBegin(GL_POLYGON);
+            for (size_t i = 0; i < face.vertexIndices.size(); ++i) {
+                // Нормаль для освещения
+                int nIdx = face.normalIndices[i];
+                if (nIdx >= 0 && nIdx < (int)normals.size()) {
+                    glNormal3f(normals[nIdx].x, normals[nIdx].y, normals[nIdx].z);
+                }
+                
+                // Вершина
+                int vIdx = face.vertexIndices[i];
+                glVertex3f(vertices[vIdx].x, vertices[vIdx].y, vertices[vIdx].z);
             }
-            int vIdx = face.vertexIndices[i];
-            glVertex3f(vertices[vIdx].x, vertices[vIdx].y, vertices[vIdx].z);
+            glEnd();
         }
-        glEnd();
-    }
+    glPopMatrix(); // Возвращаем матрицу
 }
 
 void ShipObject::mousePressEvent(QMouseEvent *event) {
@@ -136,25 +164,43 @@ void ShipObject::mousePressEvent(QMouseEvent *event) {
 }
 
 void ShipObject::mouseMoveEvent(QMouseEvent *event) {
+   float dx = event->position().x() - lastMousePos.x();
+    float dy = event->position().y() - lastMousePos.y();
+
     if (event->buttons() & Qt::LeftButton) {
-        float dx = event->x() - lastMousePos.x();
-        float dy = event->y() - lastMousePos.y();
+        // Вращение (Орбита)
+        cameraYaw += dx * 0.2f;
+        cameraPitch += dy * 0.2f;
+        
+        // Ограничиваем вертикальный угол, чтобы не "перевернуться"
+        cameraPitch = std::clamp(cameraPitch, -89.0f, 89.0f);
 
-        cameraYaw += dx * 0.5f;
-        cameraPitch += dy * 0.5f;
+    } else if (event->buttons() & Qt::RightButton) {
+        // Панорамирование (Смещение точки обзора)
+        // Коэффициент 0.01f подбирается под масштаб модели
+        float factor = cameraDistance * 0.001f; 
+        
+        // Математика для учета поворота камеры при смещении
+        float radYaw = cameraYaw * M_PI / 180.0f;
+        float radPitch = cameraPitch * M_PI / 180.0f;
 
-        // Clamp pitch to avoid flipping
-        if (cameraPitch > 89.0f) cameraPitch = 89.0f;
-        if (cameraPitch < -89.0f) cameraPitch = -89.0f;
-
-        lastMousePos = event->pos();
-        update();
+        cameraTarget.setX(cameraTarget.x() - (dx * cos(radYaw) + dy * sin(radPitch) * sin(radYaw)) * factor);
+        cameraTarget.setY(cameraTarget.y() + (dy * cos(radPitch)) * factor);
+        cameraTarget.setZ(cameraTarget.z() - (dx * -sin(radYaw) + dy * sin(radPitch) * cos(radYaw)) * factor);
     }
+
+    lastMousePos = event->pos();
+    update();
 }
 
 void ShipObject::wheelEvent(QWheelEvent *event) {
-    cameraDistance -= event->angleDelta().y() / 120.0f * 0.5f;
+   // Плавный зум, зависящий от текущей дистанции (чем ближе, тем медленнее зум)
+    float delta = event->angleDelta().y() / 120.0f;
+    cameraDistance -= delta * (cameraDistance * 0.1f);
+    
     if (cameraDistance < 0.1f) cameraDistance = 0.1f;
+    if (cameraDistance > 50.0f) cameraDistance = 50.0f;
+    
     update();
 }
 

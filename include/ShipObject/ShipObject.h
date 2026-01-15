@@ -43,5 +43,5 @@ private:
     QPoint lastMousePos;
     float colorR, colorG, colorB; // Store ship color
 
-   
+    QVector3D cameraTarget = {0, 0, 0}; // Точка, куда смотрит камера
 };
