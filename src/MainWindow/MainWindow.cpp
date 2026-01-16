@@ -6,6 +6,8 @@
 #include <QTimer>
 #include "NavigationInfoTool.h"
 #include "MapViewTool.h"
+#include "TopPanel.h"
+
 MainWindow* MainWindow::_instance = nullptr;
 
 MainWindow* MainWindow::getInstance(){
@@ -15,7 +17,8 @@ MainWindow* MainWindow::getInstance(){
     return _instance;
 }
 
-MainWindow::MainWindow(QWidget* parent): QMainWindow(parent), ui(new Ui::MainWindow){
+MainWindow::MainWindow(QWidget* parent): QMainWindow(parent), ui(new Ui::MainWindow),
+topPanel(new TopPanel(this)){
     ui->setupUi(this);
 
     QFile file(":/styles/style");
@@ -41,6 +44,12 @@ MainWindow::MainWindow(QWidget* parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(ui->widgetGrid,&GridWidget::addReady,this, &MainWindow::requestAdd);
     connect(ui->widgetGrid,&GridWidget::removeClicked,this, &MainWindow::removeWidgetFromGrid);
 
+    ui->toolBar->addWidget(topPanel);
+
+    connect(topPanel, &TopPanel::exitTriggered, [=](){
+       this->deleteLater();
+    });
+    connect(topPanel, &TopPanel::changeVisRightPanel, this, &MainWindow::visibilityRightPanelChange);
 }
 
 
@@ -94,5 +103,19 @@ void MainWindow::removeWidgetFromGrid(WindowsDef::WindowId remove){
     ToolWidgetBase *child = findChild<ToolWidgetBase*>(windowIdStr);
     if(child){
         child->setAddState(ToolWidgetBase::StatusWidget::NoAdd);
+    }
+}
+
+void MainWindow::visibilityRightPanelChange(bool visible){
+    ui->PanelWidget->setVisible(visible);
+    QGridLayout *layout = qobject_cast<QGridLayout*>(centralWidget()->layout());
+    if (layout) {
+        if (visible) {
+            layout->setColumnStretch(0, 1); 
+            layout->setColumnStretch(1, 4); 
+        } else {
+            layout->setColumnStretch(0, 0); 
+            layout->setColumnStretch(1, 5); 
+        }
     }
 }

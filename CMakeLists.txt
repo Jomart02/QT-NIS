@@ -17,6 +17,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/NavigationInfo/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/DockContainer/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/BaseSettingsWindow/)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/MapView/)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include/TopPanel/)
 
 add_subdirectory(./ToolBoxWidget)
 add_subdirectory(./internal/NavyComponents)
@@ -37,6 +38,7 @@ set(HDRS
     ./include/BaseSettingsWindow/BaseSettingsWindow.h
     ./include/MapView/MapViewTool.h
     ./include/MapView/MapView.h
+    ./include/TopPanel/TopPanel.h
 )
 
 set(SRCS
@@ -54,6 +56,7 @@ set(SRCS
     ./src/BaseSettingsWindow/BaseSettingsWindow.cpp
     ./src/MapView/MapViewTool.cpp
     ./src/MapView/MapView.cpp
+    ./src/TopPanel/TopPanel.cpp
 )
 
 set(QRCS
@@ -67,6 +70,7 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS
     ui/NavigationInfo/
     ui/DockContainer/
     ui/MapView/
+    ui/TopPanel/
 )
 
 find_package(Qt6 REQUIRED COMPONENTS Widgets Quick Location Positioning QuickWidgets Core Gui 3DCore 3DRender 3DExtras OpenGL OpenGLWidgets)

@@ -1,4 +1,3 @@
-#pragma once
 #include "BaseSettingsWindow.h"
 #include <QPushButton>
 #include <QVBoxLayout>

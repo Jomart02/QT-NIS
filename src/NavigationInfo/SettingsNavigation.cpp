@@ -1,5 +1,3 @@
-#pragma once
-
 #include "SettingsNavigation.h"
 #include "ui_SettingsNavigation.h"
 

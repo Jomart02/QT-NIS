@@ -5,8 +5,8 @@ import QtLocation
 
 Item {
     id: root
-    width: 600
-    height: 600
+    // width: 600
+    // height: 600
 
     signal mapClicked(double latitude, double longitude)
 

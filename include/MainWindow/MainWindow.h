@@ -8,6 +8,8 @@ namespace Ui
     class MainWindow;
 }
 
+class TopPanel;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -22,6 +24,7 @@ private slots:
     void showModeClicked(WindowsDef::WindowId id,ToolWidgetBase::RequestAdd show,bool &accept);
     void requestAdd(WindowsDef::WindowId selectAdd, QString nameCell);
     void removeWidgetFromGrid(WindowsDef::WindowId remove);
+    void visibilityRightPanelChange(bool visible);
 private:
     MainWindow(QWidget* parent = nullptr);
 private:
@@ -29,4 +32,5 @@ private:
     Ui::MainWindow* ui;
     ToolWidgetBase *currentAdd = nullptr;
     static MainWindow* _instance; 
+    TopPanel *topPanel = nullptr;
 };
