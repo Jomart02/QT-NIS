@@ -151,7 +151,7 @@ void GridWidget::createGrid(int rows, int cols){
     for (int row = 0; row < rows; ++row) {
         for (int col = 0; col < cols; ++col) {
             CellWidget *cell = new CellWidget(this);
-            cell->setObjectName("CELL" + QString::number(row+col));
+            cell->setObjectName("CELL" + QString::number(row) + QString::number(col));
             m_gridLayout->addWidget(cell, row, col);
             connect(cell, &CellWidget::clickedAdd, this, &GridWidget::addWidgetClicked);
             connect(cell, &CellWidget::deleteClicked, this, &GridWidget::removeWidgetClicked);
