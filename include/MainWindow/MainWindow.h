@@ -25,6 +25,7 @@ private slots:
     void requestAdd(WindowsDef::WindowId selectAdd, QString nameCell);
     void removeWidgetFromGrid(WindowsDef::WindowId remove);
     void visibilityRightPanelChange(bool visible);
+    void initMultiDisplay();
 private:
     MainWindow(QWidget* parent = nullptr);
 private:

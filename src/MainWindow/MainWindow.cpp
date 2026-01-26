@@ -7,6 +7,8 @@
 #include "NavigationInfoTool.h"
 #include "MapViewTool.h"
 #include "TopPanel.h"
+#include <QScreen>
+#include <QWindow>
 
 MainWindow* MainWindow::_instance = nullptr;
 
@@ -55,6 +57,25 @@ topPanel(new TopPanel(this)){
 
 MainWindow::~MainWindow(){
 
+}
+
+void MainWindow::initMultiDisplay() {
+    QList<QScreen *> screens = QGuiApplication::screens();
+    
+
+    for (int i = 1; i < screens.size(); ++i) {
+        GridWidget *extraGrid = new GridWidget(); 
+        
+        extraGrid->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+        extraGrid->show();
+        
+        extraGrid->windowHandle()->setScreen(screens[i]);
+        extraGrid->showFullScreen();
+        
+        connect(this, &MainWindow::addState, extraGrid, &GridWidget::setAddState);
+        connect(extraGrid,&GridWidget::addReady,this, &MainWindow::requestAdd);
+        connect(extraGrid,&GridWidget::removeClicked,this, &MainWindow::removeWidgetFromGrid);
+    }
 }
 
 void MainWindow::showModeClicked(WindowsDef::WindowId id,ToolWidgetBase::RequestAdd show,bool &accept){

@@ -1,7 +1,118 @@
 
+
+/* *{
+     color: #0079C1;
+     font-family: Arial, Helvetica, sans-serif;
+     font-size: 14px;
+
+     selection-background-color: #6effe8;
+     selection-color: #000000;
+     font-weight: bold;
+     background-color: #b9b9b9;
+}
+
+QScrollArea,
+QStackedWidget,
+QWidget > QToolBox,
+QToolBox > QWidget,
+QTabWidget > QWidget {
+  border: none;
+}
+QToolBar{
+     border-bottom:  4px solid #0079C1;
+}
+
+QDateTimeEdit,
+QSpinBox,
+QDoubleSpinBox,
+QTextEdit,
+QLineEdit,
+QPushButton {
+     color: #0079C1;
+     background-color: #dacfcf;
+     border: 4px solid #0079C1;
+     border-radius: 6px;
+     height: 40px;
+}
+QPushButton:hover {
+     background-color: #ccc2c2;
+}
+QPushButton:pressed {
+     background-color: #b3aaaa;
+} */
+
+/* QDateTimeEdit,
+QSpinBox,
+QDoubleSpinBox,
+QTreeView,
+QListView,
+QLineEdit,
+QComboBox {
+  color: #000000;
+  padding-left: 16px;
+  border-radius: 0px;
+  border-radius: 0px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  height: 32px;
+  background-color: rgba(35, 38, 41, 0.75);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-width: 0 0 2px 0;
+} */
+/* 
+QPlainTextEdit {
+  border-radius: 4px;
+  padding: 8px 16px;
+  background-color: #31363b;
+  border: 2px solid #4f5b62;
+}
+
+QTextEdit {
+  padding: 8px 16px;
+  border-radius: 4px;
+  background-color: #232629;
+}
+
+QDateTimeEdit:disabled,
+QSpinBox:disabled,
+QDoubleSpinBox:disabled,
+QTextEdit:disabled,
+QLineEdit:disabled {
+  color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(35, 38, 41, 0.3);
+  border: 2px solid #232629;
+  border-width: 0 0 2px 0;
+  padding: 0px 16px;
+  border-radius: 0px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  height: 32px;
+} */
+
+
+
+TitleWidget QPushButton{
+    border:0;
+    background-color: transparent;
+    margin:0px;
+}
+
+QPushButton[showButton = true]{
+     border: none;
+}
+QPushButton[showButton = true][showStatus = "0"]{
+     background-color: red;
+}
+QPushButton[showButton = true][showStatus = "1"]{
+     background-color: grey;
+}
+QPushButton[showButton = true][showStatus = "2"]{
+     background-color: green;
+}
+
 TitleWidget QFrame#frameDock{
     background-color: #000D81;
-    /* border: 1px solid #000D81; */
+    border: 1px solid #000D81;
 }
 
 TitleWidget QFrame#frameDock{
@@ -16,24 +127,3 @@ TitleWidget QLabel{
     color:white;
 }
 
-TitleWidget QPushButton{
-    border:0;
-    background-color: transparent;
-    margin:0px;
-}
-
-QPushButton{
-     color:black;
-}
-QPushButton[showButton = true]{
-     background-color: white;
-}
-QPushButton[showButton = true][showStatus = "0"]{
-     background-color: red;
-}
-QPushButton[showButton = true][showStatus = "1"]{
-     background-color: grey;
-}
-QPushButton[showButton = true][showStatus = "2"]{
-     background-color: green;
-}
