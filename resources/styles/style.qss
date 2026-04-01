@@ -127,3 +127,10 @@ TitleWidget QLabel{
     color:white;
 }
 
+
+DockContainer{
+     qproperty-titleHeight: 48;
+     qproperty-titleColor: #5466c2;
+
+}
+
