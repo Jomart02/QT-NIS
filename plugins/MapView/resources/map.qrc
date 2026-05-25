@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>MapView.qml</file>
+        <file alias="marker">cur.svg</file>
+    </qresource>
+</RCC>
