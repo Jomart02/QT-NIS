@@ -24,6 +24,8 @@ add_library(NisCore SHARED
     ui/IUiHost.h
     ui/ToolWidgetBase.h
     ui/ToolWidgetBase.cpp
+    ui/RibbonGroup.h
+    ui/RibbonGroup.cpp
 )
 
 target_include_directories(NisCore PUBLIC

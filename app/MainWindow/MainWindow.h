@@ -8,7 +8,7 @@
 #include "GridWidget.h"
 
 namespace Ui { class MainWindow; }
-class TopPanel;
+class RibbonBar;
 class QAction;
 
 class MainWindow : public QMainWindow, public IUiHost {
@@ -20,6 +20,8 @@ public:
     // ── IUiHost ─────────────────────────────────────────────────────────────
     void addToolPanel(const QString& id, const QString& title,
                       ToolWidgetBase* panel)                               override;
+    void addRibbonGroup(const QString& tabTitle,
+                        RibbonGroup* group)                                override;
     void showSettings(const QString& title, QWidget* settings)            override;
     void addStatusBarWidget(QWidget* widget, int stretch = 0)             override;
     void addMenuAction(const QString& menuTitle, QAction* action)         override;
@@ -34,9 +36,12 @@ private slots:
     void onVisibilityRightPanelChange(bool visible);
 
 private:
-    Ui::MainWindow*  ui;
-    ToolWidgetBase*  m_currentAdd = nullptr;
-    TopPanel*        m_topPanel   = nullptr;
+    // Builds the built-in "Home" ribbon tab with system controls.
+    void setupHomeRibbonTab();
+
+    Ui::MainWindow* ui;
+    ToolWidgetBase* m_currentAdd = nullptr;
+    RibbonBar*      m_ribbon     = nullptr;
 
     QMap<QString, QMenu*> m_menus;
 };

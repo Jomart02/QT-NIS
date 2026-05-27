@@ -131,6 +131,113 @@ TitleWidget QLabel{
 DockContainer{
      qproperty-titleHeight: 48;
      qproperty-titleColor: #5466c2;
+}
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Ribbon
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Whole ribbon container ─────────────────────────────────────────────── */
+QWidget#ribbonBar {
+    background-color: #1a2035;
+    border-bottom: 2px solid #0079C1;
+}
+
+/* ── Tab strip ──────────────────────────────────────────────────────────── */
+QTabBar#ribbonTabBar {
+    background-color: #0d1526;
+}
+
+QTabBar#ribbonTabBar::tab {
+    background-color: #0d1526;
+    color: #8fa8d0;
+    padding: 6px 18px;
+    border: none;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+QTabBar#ribbonTabBar::tab:selected {
+    background-color: #1a2035;
+    color: #ffffff;
+    border-top: 2px solid #0079C1;
+}
+
+QTabBar#ribbonTabBar::tab:hover:!selected {
+    background-color: #162040;
+    color: #c0d4f0;
+}
+
+/* ── Content stack (the area that holds groups) ─────────────────────────── */
+QStackedWidget#ribbonStack {
+    background-color: #1a2035;
+}
+
+/* ── Group container ────────────────────────────────────────────────────── */
+QWidget#ribbonGroupContent {
+    background-color: transparent;
+}
+
+/* ── Group title label ──────────────────────────────────────────────────── */
+QLabel#ribbonGroupTitle {
+    color: #8fa8d0;
+    font-size: 10px;
+    background-color: transparent;
+    padding: 0px;
+}
+
+/* ── Thin horizontal divider under group content ────────────────────────── */
+QFrame#ribbonGroupDivider {
+    color: #2e4070;
+    background-color: #2e4070;
+}
+
+/* ── Vertical separator between groups ─────────────────────────────────── */
+QFrame#ribbonGroupSep {
+    color: #2e4070;
+    background-color: #2e4070;
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+/* ── Buttons inside the ribbon ──────────────────────────────────────────── */
+RibbonGroup QPushButton {
+    background-color: transparent;
+    color: #c8daf5;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    min-height: 28px;
+    min-width: 52px;
+}
+
+RibbonGroup QPushButton:hover {
+    background-color: #243260;
+    border-color: #4a6aaa;
+    color: #ffffff;
+}
+
+RibbonGroup QPushButton:pressed {
+    background-color: #1a2848;
+    border-color: #0079C1;
+}
+
+RibbonGroup QPushButton:checked {
+    background-color: #0057a0;
+    border-color: #0079C1;
+    color: #ffffff;
+}
+
+/* ── Exit button gets a subtle red tint ────────────────────────────────── */
+RibbonGroup QPushButton#ribbonExitBtn {
+    color: #f08080;
+}
+
+RibbonGroup QPushButton#ribbonExitBtn:hover {
+    background-color: #5c1a1a;
+    border-color: #c04040;
+    color: #ffffff;
 }
 

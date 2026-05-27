@@ -23,16 +23,14 @@ set(APP_SOURCES
     DockContainer/TitleWidget.h
     DockContainer/TitleWidget.cpp
     DockContainer/TitleWidget.ui
-    TopPanel/TopPanel.h
-    TopPanel/TopPanel.cpp
-    TopPanel/TopPanel.ui
+    Ribbon/RibbonBar.h
+    Ribbon/RibbonBar.cpp
     resources/app.qrc
 )
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS
     ${CMAKE_CURRENT_SOURCE_DIR}/MainWindow
     ${CMAKE_CURRENT_SOURCE_DIR}/DockContainer
-    ${CMAKE_CURRENT_SOURCE_DIR}/TopPanel
 )
 
 add_executable(QT-NIS ${APP_SOURCES})
@@ -42,7 +40,7 @@ target_include_directories(QT-NIS PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/MainWindow
     ${CMAKE_CURRENT_SOURCE_DIR}/GridWidget
     ${CMAKE_CURRENT_SOURCE_DIR}/DockContainer
-    ${CMAKE_CURRENT_SOURCE_DIR}/TopPanel
+    ${CMAKE_CURRENT_SOURCE_DIR}/Ribbon
     ${CMAKE_CURRENT_SOURCE_DIR}/BaseGridWidgetItem
     ${CMAKE_CURRENT_SOURCE_DIR}/BaseHandlerNaviData
 )
@@ -67,4 +65,3 @@ target_link_libraries(QT-NIS PRIVATE
     Qt6::OpenGL
     Qt6::OpenGLWidgets
 )
-
