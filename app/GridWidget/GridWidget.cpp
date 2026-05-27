@@ -144,6 +144,11 @@ GridWidget::~GridWidget() = default;
 
 void GridWidget::createGrid(int rows, int cols)
 {
+    m_gridRows = rows;
+    m_gridCols = cols;
+    m_fullCell = nullptr;
+    m_cellDefs.clear();
+
     delete m_gridLayout;
     m_gridLayout = new QGridLayout(this);
     m_gridLayout->setSpacing(0);
@@ -154,6 +159,7 @@ void GridWidget::createGrid(int rows, int cols)
             auto* cell = new CellWidget(this);
             cell->setObjectName("CELL" + QString::number(row) + QString::number(col));
             m_gridLayout->addWidget(cell, row, col);
+            m_cellDefs[cell] = {row, col, 1, 1};
             connect(cell, &CellWidget::clickedAdd,      this, &GridWidget::addWidgetClicked);
             connect(cell, &CellWidget::deleteClicked,   this, &GridWidget::removeWidgetClicked);
             connect(cell, &CellWidget::showModeClicked, this, &GridWidget::showFullClicked);
@@ -189,6 +195,23 @@ void GridWidget::setAddState(const QString& pluginId, StateAdd state)
     m_idAdd = (state == StateAdd::ReadyAdd) ? pluginId : QString{};
 }
 
+void GridWidget::exitFullScreenIfNeeded(CellWidget* cell)
+{
+    if (!cell || !cell->isFull()) return;
+
+    // Возвращаем ячейку на исходную позицию в layout
+    const GridCellDef& d = m_cellDefs.value(cell);
+    m_gridLayout->removeWidget(cell);
+    m_gridLayout->addWidget(cell, d.row, d.col, d.rowSpan, d.colSpan);
+
+    // Показываем все ячейки, которые были скрыты
+    for (auto* c : findChildren<CellWidget*>())
+        c->setVisible(true);
+
+    cell->setShowState(CellWidget::ShowState::Normal);
+    m_fullCell = nullptr;
+}
+
 void GridWidget::removeWidgetClicked()
 {
     auto* cell = qobject_cast<CellWidget*>(sender());
@@ -198,13 +221,9 @@ void GridWidget::removeWidgetClicked()
     if (it == cellWidgets.end()) return;
 
     emit removeClicked(it->second);
+    // Сначала выходим из full-screen (если нужно), потом очищаем содержимое
+    exitFullScreenIfNeeded(cell);
     cell->clearChildWidget();
-
-    if (cell->isFull()) {
-        for (auto* c : findChildren<CellWidget*>())
-            if (c != cell) c->setVisible(true);
-        cell->setShowState(CellWidget::ShowState::Normal);
-    }
     cellWidgets.erase(it);
 }
 
@@ -216,12 +235,8 @@ void GridWidget::removeWidget(const QString& pluginId)
     auto* cell = findChild<CellWidget*>(name);
     if (!cell) return;
 
+    exitFullScreenIfNeeded(cell);
     cell->clearChildWidget();
-    if (cell->isFull()) {
-        for (auto* c : findChildren<CellWidget*>())
-            if (c != cell) c->setVisible(true);
-        cell->setShowState(CellWidget::ShowState::Normal);
-    }
     cellWidgets.erase(name);
 }
 
@@ -231,10 +246,27 @@ void GridWidget::showFullClicked()
     if (!cell) return;
 
     const bool needFull = !cell->isFull();
-    for (auto* c : findChildren<CellWidget*>())
-        if (c != cell) c->setVisible(!needFull);
-    cell->setShowState(needFull ? CellWidget::ShowState::Full
-                                : CellWidget::ShowState::Normal);
+
+    if (needFull) {
+        // ── Переход в полноэкранный режим ────────────────────────────────────
+        // Проблема: если у ячейки colSpan < m_gridCols (в асимметричной раскладке),
+        // простое скрытие соседей не даёт ей расшириться на всю ширину GridWidget,
+        // поскольку QGridLayout ограничивает виджет его зарегистрированными столбцами.
+        //
+        // Решение: временно перерегистрируем ячейку на весь диапазон (0, 0, rows, cols).
+        // Это гарантирует полный охват независимо от исходного span.
+        m_gridLayout->removeWidget(cell);
+        m_gridLayout->addWidget(cell, 0, 0, m_gridRows, m_gridCols);
+
+        for (auto* c : findChildren<CellWidget*>())
+            if (c != cell) c->setVisible(false);
+
+        cell->setShowState(CellWidget::ShowState::Full);
+        m_fullCell = cell;
+
+    } else {
+        exitFullScreenIfNeeded(cell);
+    }
 }
 
 QString GridWidget::cellNameForPlugin(const QString& pluginId) const
@@ -242,4 +274,44 @@ QString GridWidget::cellNameForPlugin(const QString& pluginId) const
     for (const auto& [cell, id] : cellWidgets)
         if (id == pluginId) return cell;
     return {};
+}
+
+void GridWidget::applyLayout(const GridLayoutDef& def)
+{
+    // Сохраняем снимок ID размещённых плагинов до очистки карты
+    QList<QString> placedIds;
+    placedIds.reserve(static_cast<int>(cellWidgets.size()));
+    for (const auto& [cellName, pluginId] : cellWidgets)
+        placedIds.append(pluginId);
+
+    // Сбрасываем всё состояние
+    cellWidgets.clear();
+    m_idAdd.clear();
+    m_cellDefs.clear();
+    m_fullCell = nullptr;
+    m_gridRows = def.rows;
+    m_gridCols = def.cols;
+
+    // Удаляем старые ячейки
+    qDeleteAll(findChildren<CellWidget*>(QString{}, Qt::FindDirectChildrenOnly));
+
+    // Перестраиваем компоновку
+    delete m_gridLayout;
+    m_gridLayout = new QGridLayout(this);
+    m_gridLayout->setSpacing(0);
+    m_gridLayout->setContentsMargins(0, 0, 0, 0);
+
+    for (const GridCellDef& c : def.cells) {
+        auto* cell = new CellWidget(this);
+        cell->setObjectName(QStringLiteral("CELL%1%2").arg(c.row).arg(c.col));
+        m_gridLayout->addWidget(cell, c.row, c.col, c.rowSpan, c.colSpan);
+        m_cellDefs[cell] = c;  // сохраняем для восстановления после full-screen
+        connect(cell, &CellWidget::clickedAdd,      this, &GridWidget::addWidgetClicked);
+        connect(cell, &CellWidget::deleteClicked,   this, &GridWidget::removeWidgetClicked);
+        connect(cell, &CellWidget::showModeClicked, this, &GridWidget::showFullClicked);
+    }
+    setLayout(m_gridLayout);
+
+    for (const QString& pluginId : placedIds)
+        emit removeClicked(pluginId);
 }

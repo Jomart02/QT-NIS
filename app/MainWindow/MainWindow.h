@@ -4,6 +4,7 @@
 #include <QMap>
 
 #include "IUiHost.h"
+#include "GridLayoutDef.h"
 #include "ToolWidgetBase.h"
 #include "GridWidget.h"
 
@@ -22,6 +23,7 @@ public:
                       ToolWidgetBase* panel)                               override;
     void addRibbonGroup(const QString& tabTitle,
                         RibbonGroup* group)                                override;
+    void applyGridLayout(const GridLayoutDef& def)                         override;
     void showSettings(const QString& title, QWidget* settings)            override;
     void addStatusBarWidget(QWidget* widget, int stretch = 0)             override;
     void addMenuAction(const QString& menuTitle, QAction* action)         override;

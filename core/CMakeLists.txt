@@ -22,6 +22,7 @@ add_library(NisCore SHARED
 
 
     ui/IUiHost.h
+    ui/GridLayoutDef.h
     ui/ToolWidgetBase.h
     ui/ToolWidgetBase.cpp
     ui/RibbonGroup.h

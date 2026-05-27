@@ -62,7 +62,7 @@ void MainWindow::setupHomeRibbonTab()
             this,     &MainWindow::onVisibilityRightPanelChange);
     appGroup->addWidget(panelBtn);
 
-    addRibbonGroup(tr("Home"), appGroup);
+    addRibbonGroup(tr("Главная"), appGroup);
 }
 
 // ---------------------------------------------------------------------------
@@ -88,6 +88,18 @@ void MainWindow::addToolPanel(const QString& id, const QString& title,
 void MainWindow::addRibbonGroup(const QString& tabTitle, RibbonGroup* group)
 {
     m_ribbon->addGroup(tabTitle, group);
+}
+
+void MainWindow::applyGridLayout(const GridLayoutDef& def)
+{
+    // Если в данный момент пользователь выбирает ячейку для плагина —
+    // сбрасываем это состояние перед перестройкой сетки.
+    if (m_currentAdd) {
+        m_currentAdd->setAddState(ToolWidgetBase::StatusWidget::NoAdd);
+        m_currentAdd = nullptr;
+        emit addState(QString{}, StateAdd::Normal);
+    }
+    ui->widgetGrid->applyLayout(def);
 }
 
 void MainWindow::showSettings(const QString& title, QWidget* settings)
