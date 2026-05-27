@@ -25,6 +25,10 @@ set(APP_SOURCES
     DockContainer/TitleWidget.ui
     Ribbon/RibbonBar.h
     Ribbon/RibbonBar.cpp
+    Style/NisStyle.h
+    Style/NisStyle.cpp
+    Style/NisPalette.h
+    Style/NisPalette.cpp
     resources/app.qrc
 )
 
@@ -41,6 +45,7 @@ target_include_directories(QT-NIS PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/GridWidget
     ${CMAKE_CURRENT_SOURCE_DIR}/DockContainer
     ${CMAKE_CURRENT_SOURCE_DIR}/Ribbon
+    ${CMAKE_CURRENT_SOURCE_DIR}/Style
     ${CMAKE_CURRENT_SOURCE_DIR}/BaseGridWidgetItem
     ${CMAKE_CURRENT_SOURCE_DIR}/BaseHandlerNaviData
 )

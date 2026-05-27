@@ -5,10 +5,15 @@
 #include "PluginManager.h"
 #include "DirectoryManager.h"
 #include "Logger.h"
+#include "NisStyle.h"
+#include "NisPalette.h"
 
 NisApplication::NisApplication(int& argc, char** argv)
     : QApplication(argc, argv)
 {
+    setStyle(new NisStyle());
+    setPalette(NisPalette::dark());
+
     Logger::install();
     DirectoryManager::instance().init(applicationDirPath());
 

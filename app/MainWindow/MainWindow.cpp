@@ -6,7 +6,6 @@
 #include "RibbonGroup.h"
 
 #include <QAction>
-#include <QFile>
 #include <QGridLayout>
 #include <QMenu>
 #include <QMenuBar>
@@ -21,29 +20,17 @@ MainWindow::MainWindow(QWidget* parent)
 {
     ui->setupUi(this);
 
-    QFile file(":/styles/style");
-    if (file.open(QIODevice::ReadOnly))
-        setStyleSheet(file.readAll());
-    else
-        qWarning() << "Could not open QSS file";
-
-    // ── Wire grid signals ────────────────────────────────────────────────────
     connect(this,           &MainWindow::addState,      ui->widgetGrid, &GridWidget::setAddState);
     connect(ui->widgetGrid, &GridWidget::addReady,      this,           &MainWindow::onAddReady);
     connect(ui->widgetGrid, &GridWidget::removeClicked, this,           &MainWindow::onRemoveWidget);
 
-    // ── Embed the ribbon in the toolbar ─────────────────────────────────────
     ui->toolBar->addWidget(m_ribbon);
 
-    // ── Built-in system tab ──────────────────────────────────────────────────
     setupHomeRibbonTab();
 }
 
 MainWindow::~MainWindow() = default;
 
-// ---------------------------------------------------------------------------
-// Private helpers
-// ---------------------------------------------------------------------------
 
 void MainWindow::setupHomeRibbonTab()
 {
@@ -65,9 +52,6 @@ void MainWindow::setupHomeRibbonTab()
     addRibbonGroup(tr("Главная"), appGroup);
 }
 
-// ---------------------------------------------------------------------------
-// IUiHost
-// ---------------------------------------------------------------------------
 
 void MainWindow::addToolPanel(const QString& id, const QString& title,
                                ToolWidgetBase* panel)
@@ -124,9 +108,6 @@ void MainWindow::addMenuAction(const QString& menuTitle, QAction* action)
     m_menus[menuTitle]->addAction(action);
 }
 
-// ---------------------------------------------------------------------------
-// Private slots
-// ---------------------------------------------------------------------------
 
 void MainWindow::onShowModeClicked(const QString& pluginId,
                                     ToolWidgetBase::RequestAdd show,
@@ -173,8 +154,6 @@ void MainWindow::onVisibilityRightPanelChange(bool visible)
 {
     ui->PanelWidget->setVisible(visible);
 
-    // The central widget has a QGridLayout with columns [PanelWidget, GridWidget].
-    // Adjust stretch so GridWidget expands when the panel is hidden.
     if (auto* layout = qobject_cast<QGridLayout*>(centralWidget()->layout())) {
         layout->setColumnStretch(0, visible ? 1 : 0);
         layout->setColumnStretch(1, visible ? 4 : 5);
